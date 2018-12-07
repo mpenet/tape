@@ -1,0 +1,8 @@
+#kaocha/v1
+{:tests [{:id :unit
+          :test-paths ["test"]
+          :source-paths ["src"]}]
+
+ ;; :reporter kaocha.report.progress/progress
+ ;; :plugins [kaocha.plugin/profiling]
+ }

@@ -1,0 +1,25 @@
+{:paths ["resources" "src"]
+
+ :deps {org.clojure/clojure {:mvn/version "1.10.0-RC3"}
+        org.clojure/core.async {:mvn/version "0.4.490"}
+        org.clojure/tools.logging {:mvn/version "0.4.1"}
+        net.openhft/chronicle-queue {:mvn/version "5.17.1"}
+        cc.qbits/commons {:mvn/version "0.5.1"}
+        org.clojure/data.fressian {:mvn/version "0.2.1"}
+        org.clojure/test.check {:mvn/version "0.9.0"}}
+
+ :aliases
+ {:test {:extra-deps {lambdaisland/kaocha {:mvn/version "0.0-305"}
+                      org.slf4j/slf4j-log4j12 {:mvn/version "1.7.25"}}}
+
+  :cljfmt {:extra-deps {com.jameslaverack/cljfmt-runner {:git/url "https://github.com/JamesLaverack/cljfmt-runner"
+                                                         :sha "fc12c2724c44185cd1b221a79c8486c73846f14c"
+                                                         :exclusions [cljfmt]}
+                        cljfmt {:mvn/version "0.6.1"}}
+           :main-opts ["-m" "cljfmt-runner.check"]}
+
+  :cljfmt/fix {:main-opts ["-m" "cljfmt-runner.fix"]}
+
+  :eastwood
+  {:main-opts ["-m" "eastwood.lint" "{:source-paths,[\"src\"]}"]
+   :extra-deps {jonase/eastwood {:mvn/version "RELEASE"}}}}}
