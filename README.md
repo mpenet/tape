@@ -1,6 +1,6 @@
 # tape
 
-[![cljdoc badge](https://cljdoc.xyz/badge/cc.qbits/tape)](https://cljdoc.xyz/d/cc.qbits/tape/CURRENT)
+[![cljdoc badge](https://cljdoc.xyz/badge/cc.qbits/tape)](https://cljdoc.xyz/d/cc.qbits/tape/CURRENT) [![Clojars Project](https://img.shields.io/clojars/v/cc.qbits/tape.svg)](https://clojars.org/cc.qbits/tape)
 
 <img src="http://i.imgur.com/yNrbl1D.png" title="qbits/tape" align="right"/>
 
@@ -21,7 +21,7 @@ rewriting/dropping most of it, hence the rename.
 
 ## Installation
 
-<!-- `tape` is [available on Clojars](https://clojars.org/cc.qbits/tape). -->
+`tape` is [available on Clojars](https://clojars.org/cc.qbits/tape).
 
 ## Usage
 
