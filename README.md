@@ -44,8 +44,8 @@ rewriting/dropping most of it, hence the rename.
 (def appender (appender/make q))
 
 ;; add stuff to queue, returns index
-(appender/write! t {:foo [:bar {:baz 0}]}) => 76759655514210
-(appender/write! t {:another :thing}) => 76759655514211
+(appender/write! appender {:foo [:bar {:baz 0}]}) => 76759655514210
+(appender/write! appender {:another :thing}) => 76759655514211
 
 (tailer/read! t) => {:foo [:bar {:baz 0}]}
 (tailer/read! t) => {:another :thing}
