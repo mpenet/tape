@@ -49,7 +49,7 @@
 (extend-protocol p/Datafiable
   ExcerptAppender
   (datafy [^ExcerptAppender appender]
-    {::cycle (.cycle appender)
-     ::last-index-appended (.lastIndexAppended appender)
-     ::source-id (.sourceId appender)
-     ::queue (.queue appender)}))
+    #::{:cycle (.cycle appender)
+        :last-index-appended (.lastIndexAppended appender)
+        :source-id (.sourceId appender)
+        :queue (.queue appender)}))
