@@ -17,17 +17,17 @@
   SingleChronicleQueue
   (datafy [^SingleChronicleQueue q]
     ;; https://github.com/OpenHFT/Chronicle-Queue/blob/master/src/main/java/net/openhft/chronicle/queue/impl/single/SingleChronicleQueue.java
-    {::source-id (.sourceId q)
-     ::last-acknowledged-index-replicated (.lastAcknowledgedIndexReplicated q)
-     ::last-index-replicated (.lastIndexReplicated q)
-     ::file (.fileAbsolutePath q)
-     ::index-count (.indexCount q)
-     ::index-spacing (.indexSpacing q)
-     ::roll-cycle (.rollCycle q)
-     ::delta-checkpoint-interval (.deltaCheckpointInterval q)
-     ::buffered (.buffered q)
-     ::cycle (.cycle q)
-     ::closed? (.isClosed q)}))
+    #::{:source-id (.sourceId q)
+        :last-acknowledged-index-replicated (.lastAcknowledgedIndexReplicated q)
+        :last-index-replicated (.lastIndexReplicated q)
+        :file (.fileAbsolutePath q)
+        :index-count (.indexCount q)
+        :index-spacing (.indexSpacing q)
+        :roll-cycle (.rollCycle q)
+        :delta-checkpoint-interval (.deltaCheckpointInterval q)
+        :buffered (.buffered q)
+        :cycle (.cycle q)
+        :closed? (.isClosed q)}))
 
 (defn closed?
   [^SingleChronicleQueue queue]

@@ -65,9 +65,9 @@
 (extend-protocol p/Datafiable
   ExcerptTailer
   (datafy [^ExcerptTailer tailer]
-    {::cycle (.cycle tailer)
-     ::index (index tailer)
-     ::source-id (.sourceId tailer)
-     ::queue (.queue tailer)
-     ::direction (.direction tailer)
-     ::state (.state tailer)}))
+    #::{:cycle (.cycle tailer)
+        :index (index tailer)
+        :source-id (.sourceId tailer)
+        :queue (.queue tailer)
+        :direction (.direction tailer)
+        :state (.state tailer)}))
