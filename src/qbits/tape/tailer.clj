@@ -68,6 +68,6 @@
          #::{:cycle (.cycle tailer)
              :index (index tailer)
              :source-id (.sourceId tailer)
-             :queue (.queue tailer)
+             :queue queue
              :direction (.direction tailer)
              :state (.state tailer)})))))
