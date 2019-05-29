@@ -23,7 +23,8 @@
 (defn make
   ([queue]
    (make queue nil))
-  ([queue opts]
+  ([queue {:keys [reducible-poll-interval]
+           :or {reducible-poll-interval 50}}]
    (let [^ExcerptTailer tailer (.createTailer (q/underlying-queue queue))
          codec (q/codec queue)]
      (reify
@@ -62,6 +63,20 @@
          (.index tailer))
 
        (queue [_] queue)
+
+       clojure.lang.IReduceInit
+       (reduce [this f init]
+         (loop [ret init]
+           (if (q/closed? queue)
+             ret
+             (if-let [x (read! this)]
+               (let [ret (f ret x)]
+                 (if (reduced? ret)
+                   @ret
+                   (recur ret)))
+               (do
+                 (Thread/sleep reducible-poll-interval)
+                 (recur ret))))))
 
        p/Datafiable
        (datafy [_]

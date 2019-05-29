@@ -67,4 +67,54 @@
            (repeatedly (count msgs)
                        #(tailer/read! *tailer*))))))
 
+(deftest test-reducible
+  (let [msgs (gen-msgs)]
+    (run! #(appender/write! *appender* %)
+          msgs)
+    (future (is (= msgs (into [] *tailer*))))
+    (Thread/sleep 100)
+    (queue/close! *queue*)))
+
+(deftest test-reducible-slow-feed
+  (let [msgs (gen-msgs)]
+    (run! #(do
+             (Thread/sleep 70)
+             (appender/write! *appender* %))
+          msgs)
+    (future (is (= msgs (into [] *tailer*))))
+    (Thread/sleep 1000)
+    (queue/close! *queue*)))
+
+
+(deftest test-reducible-closed-early
+  (let [msgs (gen-msgs)
+        len (count msgs)
+        idx (atom 0)]
+    (run! #(appender/write! *appender* %)
+          msgs)
+    (future (is (= (butlast msgs)
+                   (into []
+                         (keep #(if (> len (swap! idx inc))
+                                  %
+                                  (do (queue/close! *queue*)
+                                      nil)))
+                         *tailer*))))
+    (Thread/sleep 100)))
+
+(deftest test-reducible-reduced
+  (let [msgs (gen-msgs)
+        len (count msgs)
+        idx (atom 0)]
+    (run! #(appender/write! *appender* %)
+          msgs)
+    (future (is (= (butlast msgs)
+                   (reduce (fn [xs x]
+                             (if (> len (swap! idx inc))
+                                  (conj xs x)
+                                  (reduced xs)))
+                           []
+                           *tailer*))))
+    (Thread/sleep 100)
+    (queue/close! *queue*)))
+
 ;; (run-tests)
