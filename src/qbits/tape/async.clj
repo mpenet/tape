@@ -8,8 +8,7 @@
 (defn tailer-chan
   ([tailer]
    (tailer-chan tailer nil))
-  ([tailer {:as opts
-            :keys [ch index-meta? poll-interval]
+  ([tailer {:keys [ch index-meta? poll-interval]
             :or {ch (async/chan)
                  index-meta? false
                  poll-interval 50}}]
@@ -41,8 +40,7 @@
    (appender-chan appender nil))
   ([appender {:keys [ch error-ch]
               :or {ch (async/chan)
-                   error-ch (async/chan (async/dropping-buffer 50))}
-              :as opts}]
+                   error-ch (async/chan (async/dropping-buffer 50))}}]
    (async/thread
      (loop []
        ;; just take vals as long as it's not closed

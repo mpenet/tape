@@ -3,7 +3,7 @@
  :deps {org.clojure/clojure {:mvn/version "1.10.0"}
         org.clojure/core.async {:mvn/version "0.4.490"}
         org.clojure/tools.logging {:mvn/version "0.4.1"}
-        net.openhft/chronicle-queue {:mvn/version "5.17.9"}
+        net.openhft/chronicle-queue {:mvn/version "5.17.12"}
         cc.qbits/commons {:mvn/version "0.5.1"}
         org.clojure/data.fressian {:mvn/version "0.2.1"}
         org.clojure/test.check {:mvn/version "0.9.0"}}

@@ -5,7 +5,6 @@
             [qbits.tape.appender :as appender]
             [qbits.tape.queue :as queue]
             [clojure.core.async :as async]
-            [clojure.datafy :as d]
             [clojure.java.io :as io]
             [clojure.spec.alpha :as s]
             [clojure.spec.gen.alpha :as gen])
@@ -35,7 +34,6 @@
       (binding [*queue* queue
                 *tailer* tailer
                 *appender* appender]
-        (prn '-------------------------)
         (with-open [queue *queue*]
           (t))
         (doseq [f (reverse (file-seq (io/file dir)))]

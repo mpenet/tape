@@ -1,19 +1,15 @@
 (ns qbits.tape.tailer
   (:require [qbits.commons.enum :as enum]
-            [qbits.commons.ns :as n]
             [qbits.tape.codec :as codec]
+            [qbits.tape.queue :as q]
             [clojure.core.protocols :as p])
   (:import (net.openhft.chronicle.queue ChronicleQueue
                                         ExcerptTailer
                                         TailerDirection)))
 
-(def ->tailer-direction (enum/enum->fn TailerDirection))
+(set! *warn-on-reflection* true)
 
-(defn ^ExcerptTailer make
-  ([^ChronicleQueue queue]
-   (make queue nil))
-  ([^ChronicleQueue queue opts]
-   (.createTailer queue)))
+(def ->tailer-direction (enum/enum->fn TailerDirection))
 
 (defprotocol ITailer
   (read! [tailer])
@@ -24,50 +20,54 @@
   (index [tailer])
   (queue [tailer]))
 
-(extend-type ExcerptTailer
-  ITailer
-  (read! [^ExcerptTailer tailer]
-    (with-open [ctx (.readingDocument tailer)]
-      (let [ret (try
-                  (when (.isPresent ctx)
-                    (-> ctx
-                        .wire .read .bytes
-                        java.nio.ByteBuffer/wrap
-                        codec/read))
-                  (catch Throwable t
-                    (.rollbackOnClose ctx)
-                    t))]
-      (when (instance? Throwable ret)
-        (throw (ex-info "Tailer read failed"
-                        {:type ::read-failed
-                         :tailer tailer}
-                        ret)))
-      ret)))
+(defn make
+  ([queue]
+   (make queue nil))
+  ([queue opts]
+   (let [^ExcerptTailer tailer (.createTailer (q/underlying-queue queue))
+         codec (q/codec queue)]
+     (reify
+       ITailer
+       (read! [_]
+         (with-open [ctx (.readingDocument tailer)]
+           (let [ret (try
+                       (when (.isPresent ctx)
+                         (->> ctx
+                              .wire .read .bytes
+                              java.nio.ByteBuffer/wrap
+                              (codec/read codec)))
+                       (catch Throwable t
+                         (.rollbackOnClose ctx)
+                         t))]
+             (when (instance? Throwable ret)
+               (throw (ex-info "Tailer read failed"
+                               {:type ::read-failed
+                                :tailer tailer}
+                               ret)))
+             ret)))
 
-  (set-direction! [tailer direction]
-    (.direction tailer (->tailer-direction direction)))
+       (set-direction! [_ direction]
+         (.direction tailer (->tailer-direction direction)))
 
-  (to-index! [^ExcerptTailer tailer i]
-    (.moveToIndex tailer i))
+       (to-index! [_ i]
+         (.moveToIndex tailer i))
 
-  (to-end! [tailer]
-    (.toEnd tailer))
+       (to-end! [_]
+         (.toEnd tailer))
 
-  (to-start! [tailer]
-    (.toStart tailer))
+       (to-start! [_]
+         (.toStart tailer))
 
-  (index [tailer]
-    (.index tailer))
+       (index [_]
+         (.index tailer))
 
-  (queue [tailer]
-    (.queue tailer)))
+       (queue [_] queue)
 
-(extend-protocol p/Datafiable
-  ExcerptTailer
-  (datafy [^ExcerptTailer tailer]
-    #::{:cycle (.cycle tailer)
-        :index (index tailer)
-        :source-id (.sourceId tailer)
-        :queue (.queue tailer)
-        :direction (.direction tailer)
-        :state (.state tailer)}))
+       p/Datafiable
+       (datafy [_]
+         #::{:cycle (.cycle tailer)
+             :index (index tailer)
+             :source-id (.sourceId tailer)
+             :queue (.queue tailer)
+             :direction (.direction tailer)
+             :state (.state tailer)})))))
