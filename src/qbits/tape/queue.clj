@@ -21,12 +21,11 @@
   (closed? [q])
   (underlying-queue ^net.openhft.chronicle.queue.impl.single.SingleChronicleQueue [q]))
 
-(defn make
+(defn ^java.io.Closeable make
   "Creates and return a new queue"
   ([dir]
    (make dir nil))
-  (^java.io.Closeable
-   [dir {:keys [roll-cycle autoclose-on-jvm-exit?
+  ([dir {:keys [roll-cycle autoclose-on-jvm-exit?
                 cycle-release-tasks
                 cycle-acquire-tasks
                 codec]
@@ -74,6 +73,7 @@
                    :buffered (.buffered queue)
                    :cycle (.cycle queue)
                    :closed? (.isClosed queue)}))]
+
      (when autoclose-on-jvm-exit?
        (jvm/add-shutdown-hook!
         (fn []

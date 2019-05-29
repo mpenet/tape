@@ -28,13 +28,11 @@
   (fn setup [t]
     (let [dir (str (Files/createTempDirectory "qbits_tape_test"
                                               (into-array FileAttribute [])))
-          queue (queue/make dir)
-          tailer (tailer/make queue)
-          appender (appender/make queue)]
+          queue (queue/make dir nil)]
       (binding [*queue* queue
-                *tailer* tailer
-                *appender* appender]
-        (with-open [queue *queue*]
+                *tailer* (tailer/make queue)
+                *appender* (appender/make queue)]
+        (with-open [q *queue*]
           (t))
         (doseq [f (reverse (file-seq (io/file dir)))]
           (io/delete-file f))))))

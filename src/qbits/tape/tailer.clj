@@ -66,8 +66,8 @@
        p/Datafiable
        (datafy [_]
          #::{:cycle (.cycle tailer)
-             :index (index tailer)
+             :index (.index tailer)
              :source-id (.sourceId tailer)
-             :queue queue
              :direction (.direction tailer)
-             :state (.state tailer)})))))
+             :state (.state tailer)
+             :queue queue})))))
