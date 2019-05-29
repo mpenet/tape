@@ -9,11 +9,14 @@
 (set! *warn-on-reflection* true)
 
 (defprotocol IAppender
-  (write! [appender x])
-  (last-index [appender])
-  (queue [appender]))
+  (write! [appender x] "Writes a new message to queue.")
+  (last-index [appender] "Returns the last index this appender appended")
+  (queue [appender] "Returns associated queue to this appender"))
 
 (defn make
+  "Creates a new appender instance.
+  Takes a queue to append to as argument.
+  You can also call datafy on the appender to get associated data."
   ([queue]
    (make queue nil))
   ([queue opts]

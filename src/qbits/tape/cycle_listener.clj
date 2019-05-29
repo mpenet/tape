@@ -2,8 +2,7 @@
   (:refer-clojure :exclude [cycle])
   (:require [clojure.java.io :as io]
             [clojure.tools.logging :as log]
-            [clojure.string :as str]
-            [clojure.datafy :as d])
+            [clojure.string :as str])
   (:import (net.openhft.chronicle.queue.impl StoreFileListener)
            (net.openhft.chronicle.queue RollCycle RollCycles)
            (java.io File FileOutputStream FileInputStream)

@@ -12,15 +12,23 @@
 (def ->tailer-direction (enum/enum->fn TailerDirection))
 
 (defprotocol ITailer
-  (read! [tailer])
-  (set-direction! [tailer dir])
-  (to-index! [tailer i])
-  (to-end! [tailer])
-  (to-start! [tailer])
-  (index [tailer])
-  (queue [tailer]))
+  (read! [tailer] "Returns message from queue or nil if none are available")
+  (set-direction! [tailer dir] "Set tailer direction from :backward or :forward")
+  (to-index! [tailer i] "Goto specified queue index")
+  (to-end! [tailer] "Goto the end of the queue")
+  (to-start! [tailer] "Set index to the start of the queue")
+  (index [tailer] "Returns current tailer index")
+  (queue [tailer] "Returns Queue associated with that tailer"))
 
 (defn make
+  "Creates a new tailer that can consume a queue instance. Takes a queue
+  to read from as first argument.
+
+  `reducible-poll-interval` will set the wait interval the tailer will
+  apply when used in a reducible context only when there are no new
+  message ready to be consumed.
+
+  You can also call datafy on the tailer to get associated data"
   ([queue]
    (make queue nil))
   ([queue {:keys [reducible-poll-interval]

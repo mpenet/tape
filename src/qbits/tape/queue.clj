@@ -17,12 +17,32 @@
 
 (defprotocol IQueue
   (codec [q] "Returns codec to be used with queue instance")
-  (close! [q])
-  (closed? [q])
-  (underlying-queue ^net.openhft.chronicle.queue.impl.single.SingleChronicleQueue [q]))
+  (close! [q] "Closes the queue")
+  (closed? [q] "Returns true if the queue is closed")
+  (underlying-queue ^net.openhft.chronicle.queue.impl.single.SingleChronicleQueue [q]
+    "Returns the underlying chronicle-queue instance"))
 
 (defn ^java.io.Closeable make
-  "Creates and return a new queue"
+  "Return a queue instance that will create/bind to a directory
+
+  * `roll-cycle` roll-cycle determines how often you create a new
+  Chronicle Queue data file. Can be `:minutely`, `:daily`,
+  `:test4-daily`, `:test-hourly`, `:hourly`, `:test-secondly`,
+  `:huge-daily-xsparse`, `:test-daily`, `:large-hourly-xsparse`,
+  `:large-daily`, `:test2-daily`, `:xlarge-daily`, `:huge-daily`,
+  `:large-hourly`, `:small-daily`, `:large-hourly-sparse`
+
+  * `autoclose-on-jvm-exit?` wheter to cleanly close the queue on jvm
+  exit (defaults to true)
+
+  * `cycle-release-tasks` Tasks to run on queue release. See
+  qbits.tape.cycle-listener
+
+  * `cycle-acquire-tasks` Tasks to run on queue acquisition. See
+  qbits.tape.cycle-listener
+
+  * `codec` qbits.tape.codec/ICodec instance that will be used to
+  encode/decode messages. Default to qbits.tape.codec.fressian/default"
   ([dir]
    (make dir nil))
   ([dir {:keys [roll-cycle autoclose-on-jvm-exit?
