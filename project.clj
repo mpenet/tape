@@ -1,5 +1,5 @@
 (load-file ".scaffolding.clj")
-(defproject cc.qbits/tape (deduce-version-from-git)
+(defproject cc.qbits/tape (version)
   :description "ChronicleQueue helpers"
   :repositories ~(repositories)
   :dependencies ~(deps)
