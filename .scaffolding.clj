@@ -3,7 +3,8 @@
 
 (set! *warn-on-reflection* true)
 
-(defn version [] (slurp "version.edn"))
+(defn version []
+  (:version (edn/read-string (slurp "version.edn"))))
 
 (defonce tools-deps (delay (edn/read-string (slurp "deps.edn"))))
 
