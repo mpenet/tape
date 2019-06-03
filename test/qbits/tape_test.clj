@@ -117,4 +117,30 @@
     (Thread/sleep 100)
     (queue/close! *queue*)))
 
+
+
+(deftest test-seq
+  (let [msgs (gen-msgs)]
+    (run! #(appender/write! *appender* %)
+          msgs)
+    (future (is (= msgs (seq *tailer*))))
+    (Thread/sleep 100)
+    (queue/close! *queue*)))
+
+(deftest test-seq-slow-feed
+  (let [msgs (gen-msgs)]
+    (run! #(do
+             (Thread/sleep 70)
+             (appender/write! *appender* %))
+          msgs)
+    (future (is (= msgs (seq *tailer*))))
+    (Thread/sleep 1000)
+    (queue/close! *queue*)))
+
+
+
+
+
+
+
 ;; (run-tests)

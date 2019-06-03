@@ -72,6 +72,15 @@
 
        (queue [_] queue)
 
+       clojure.lang.Seqable
+       (seq [this]
+         ((fn step []
+            (when-not (q/closed? queue)
+              (if-let [x (read! this)]
+                (cons x (lazy-seq (step)))
+                (do (Thread/sleep reducible-poll-interval)
+                    (recur)))))))
+
        clojure.lang.IReduceInit
        (reduce [this f init]
          (loop [ret init]
@@ -85,6 +94,7 @@
                (do
                  (Thread/sleep reducible-poll-interval)
                  (recur ret))))))
+       clojure.lang.Sequential
 
        p/Datafiable
        (datafy [_]
