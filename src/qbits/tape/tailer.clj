@@ -24,15 +24,23 @@
   "Creates a new tailer that can consume a queue instance. Takes a queue
   to read from as first argument.
 
-  `reducible-poll-interval` will set the wait interval the tailer will
-  apply when used in a reducible context only when there are no new
+  `poll-interval` will set the wait interval the tailer will apply
+  when used in a reducible or seq context only when there are no new
   message ready to be consumed.
 
-  You can also call datafy on the tailer to get associated data"
+  clojure.datafy/datafy can be called on the tailer to get associated data
+
+  A tailer can also be consumed as a Seq or a Reducible.
+
+  You can effectively do `(doseq [msg tailer] ...)` or `(run!
+  #(do-something %) tailer)`.
+
+  More info about tailers :
+  https://github.com/OpenHFT/Chronicle-Queue#how-does-chronicle-queue-work"
   ([queue]
    (make queue nil))
-  ([queue {:keys [reducible-poll-interval]
-           :or {reducible-poll-interval 50}}]
+  ([queue {:keys [poll-interval]
+           :or {poll-interval 50}}]
    (let [^ExcerptTailer tailer (.createTailer (q/underlying-queue queue))
          codec (q/codec queue)]
      (reify
@@ -76,9 +84,9 @@
        (seq [this]
          ((fn step []
             (when-not (q/closed? queue)
-              (if-let [x (read! this)]
+              (if-some [x (read! this)]
                 (cons x (lazy-seq (step)))
-                (do (Thread/sleep reducible-poll-interval)
+                (do (Thread/sleep poll-interval)
                     (recur)))))))
 
        clojure.lang.IReduceInit
@@ -86,13 +94,13 @@
          (loop [ret init]
            (if (q/closed? queue)
              ret
-             (if-let [x (read! this)]
+             (if-some [x (read! this)]
                (let [ret (f ret x)]
                  (if (reduced? ret)
                    @ret
                    (recur ret)))
                (do
-                 (Thread/sleep reducible-poll-interval)
+                 (Thread/sleep poll-interval)
                  (recur ret))))))
        clojure.lang.Sequential
 

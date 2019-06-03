@@ -55,6 +55,13 @@ rewriting/dropping most of it, hence the rename.
 ;; back to some existing index, essentially rewinding to it
 (tailer/to-index! t 76759655514210)
 
+;; Tailers are also Sequential/Seqable/Reducible and behave as such.
+
+(run! (fn [msg] (println msg)) t)
+
+(doseq [msg t]
+  (println msg))
+
 [...]
 ```
 
@@ -63,10 +70,13 @@ There's also a core.async facade for appenders/tailers on
 don't care about anymore. Anything created with a `make` function can
 be inspected with `clojure.datafy/datafy`.
 
+We serialize data with fressian as a default, but you can supply your
+own qbits.tape/ICodec when you make/bind to a queue if you need to use
+something else.
 
 ## License
 
-Copyright © 2018 Max Penet
+Copyright © 2019 Max Penet
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
