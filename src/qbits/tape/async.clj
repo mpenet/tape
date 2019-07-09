@@ -8,9 +8,8 @@
 (defn tailer-chan
   ([tailer]
    (tailer-chan tailer nil))
-  ([tailer {:keys [ch index-meta? poll-interval]
+  ([tailer {:keys [ch poll-interval]
             :or {ch (async/chan)
-                 index-meta? false
                  poll-interval 50}}]
    (let [q (tailer/queue tailer)]
      (async/thread
@@ -28,8 +27,7 @@
                ;; move index back by one since we didn't consume that msg
                ;; and die
                (tailer/to-index! tailer
-                                 (-> tailer
-                                     tailer/index)))
+                                 (max 0 (dec (tailer/index tailer)))))
              ;; wait and recur
              (do (async/<!! (async/timeout poll-interval))
                  (recur)))))))
