@@ -1,10 +1,10 @@
 {:paths ["resources" "src"]
 
- :deps {org.clojure/clojure {:mvn/version "1.10.0"}
-        org.clojure/core.async {:mvn/version "0.4.490"}
+ :deps {org.clojure/clojure {:mvn/version "1.10.1"}
+        org.clojure/core.async {:mvn/version "0.4.500"}
         org.clojure/tools.logging {:mvn/version "0.4.1"}
         net.openhft/chronicle-queue {:mvn/version "5.17.13"}
-        cc.qbits/commons {:mvn/version "0.5.1"}
+        cc.qbits/commons {:mvn/version "0.5.2"}
         org.clojure/data.fressian {:mvn/version "0.2.1"}
         org.clojure/test.check {:mvn/version "0.9.0"}}
 
