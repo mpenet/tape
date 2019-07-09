@@ -71,9 +71,10 @@
   (let [msgs (gen-msgs)]
     (run! #(appender/write! *appender* %)
           msgs)
-    (future (is (= msgs (into [] *tailer*))))
-    (Thread/sleep 100)
-    (queue/close! *queue*)))
+    (let [fu (future (is (= msgs (into [] *tailer*))))]
+      (Thread/sleep 100)
+      (queue/close! *queue*)
+      @fu)))
 
 (deftest test-reducible-slow-feed
   (let [msgs (gen-msgs)]
@@ -81,10 +82,10 @@
              (Thread/sleep 70)
              (appender/write! *appender* %))
           msgs)
-    (future (is (= msgs (into [] *tailer*))))
-    (Thread/sleep 1000)
-    (queue/close! *queue*)))
-
+    (let [fu (future (is (= msgs (into [] *tailer*))))]
+      (Thread/sleep 1000)
+      (queue/close! *queue*)
+      @fu)))
 
 (deftest test-reducible-closed-early
   (let [msgs (gen-msgs)
@@ -107,25 +108,25 @@
         idx (atom 0)]
     (run! #(appender/write! *appender* %)
           msgs)
-    (future (is (= (butlast msgs)
-                   (reduce (fn [xs x]
-                             (if (> len (swap! idx inc))
-                                  (conj xs x)
-                                  (reduced xs)))
-                           []
-                           *tailer*))))
-    (Thread/sleep 100)
-    (queue/close! *queue*)))
-
-
+    (let [fu (future (is (= (butlast msgs)
+                            (reduce (fn [xs x]
+                                      (if (> len (swap! idx inc))
+                                        (conj xs x)
+                                        (reduced xs)))
+                                    []
+                                    *tailer*))))]
+      (Thread/sleep 100)
+      (queue/close! *queue*)
+      @fu)))
 
 (deftest test-seq
   (let [msgs (gen-msgs)]
     (run! #(appender/write! *appender* %)
           msgs)
-    (future (is (= msgs (seq *tailer*))))
-    (Thread/sleep 100)
-    (queue/close! *queue*)))
+    (let [fu (future (is (= msgs (seq *tailer*))))]
+      (Thread/sleep 100)
+      (queue/close! *queue*)
+      @fu)))
 
 (deftest test-seq-slow-feed
   (let [msgs (gen-msgs)]
@@ -133,9 +134,10 @@
              (Thread/sleep 70)
              (appender/write! *appender* %))
           msgs)
-    (future (is (= msgs (seq *tailer*))))
-    (Thread/sleep 1000)
-    (queue/close! *queue*)))
+    (let [fu (future (is (= msgs (seq *tailer*))))]
+      (Thread/sleep 1000)
+      (queue/close! *queue*)
+      @fu)))
 
 
 
