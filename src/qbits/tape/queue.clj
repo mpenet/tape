@@ -92,7 +92,8 @@
                    :delta-checkpoint-interval (.deltaCheckpointInterval queue)
                    :buffered (.buffered queue)
                    :cycle (.cycle queue)
-                   :closed? (.isClosed queue)}))]
+                   :closed? (.isClosed queue)
+                   :entry-count (.entryCount queue)}))]
 
      (when autoclose-on-jvm-exit?
        (jvm/add-shutdown-hook!
