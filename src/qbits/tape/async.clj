@@ -6,16 +6,18 @@
             [qbits.tape.appender :as appender]))
 
 (defn tailer-chan
-  ([tailer]
-   (tailer-chan tailer nil))
-  ([tailer {:keys [ch poll-interval]
-            :or {ch (async/chan)
-                 poll-interval 50}}]
-   (let [q (tailer/queue tailer)]
-     (async/thread
+  ([queue]
+   (tailer-chan queue nil))
+  ([queue {:keys [ch poll-interval]
+           :or {ch (async/chan)
+                poll-interval 50}
+           :as opts}]
+   (assert (satisfies? queue/IQueue queue))
+   (async/thread
+     (let [tailer (tailer/make queue opts)]
        (loop []
          ;; fetch next msg or nothing
-         (if (queue/closed? q)
+         (if (queue/closed? queue)
            (async/close! ch)
            (if-let [x (try (tailer/read! tailer)
                            (catch Exception e
@@ -34,18 +36,21 @@
    ch))
 
 (defn appender-chan
-  ([appender]
-   (appender-chan appender nil))
-  ([appender {:keys [ch error-ch]
-              :or {ch (async/chan)
-                   error-ch (async/chan (async/dropping-buffer 50))}}]
+  ([queue]
+   (appender-chan queue nil))
+  ([queue {:as opts
+           :keys [ch error-ch]
+           :or {ch (async/chan)
+                error-ch (async/chan (async/dropping-buffer 50))}}]
+   (assert (satisfies? queue/IQueue queue))
    (async/thread
-     (loop []
-       ;; just take vals as long as it's not closed
-       (when-let [x (async/<!! ch)]
-         (try
-           (appender/write! appender x)
-           (catch Throwable t
-             (async/>!! error-ch x)))
-         (recur))))
+     (let [appender (appender/make queue opts)]
+       (loop []
+         ;; just take vals as long as it's not closed
+         (when-let [x (async/<!! ch)]
+           (try
+             (appender/write! appender x)
+             (catch Throwable t
+               (async/>!! error-ch x)))
+           (recur)))))
    ch))
