@@ -46,9 +46,10 @@
                        #(tailer/read! *tailer*))))))
 
 (deftest test-async-tailer
-  (let [tailer-ch (tape.async/tailer-chan *queue*)
+  (let [ctrl-ch (async/chan)
+        tailer-ch (tape.async/tailer-chan *queue* {:ctrl-ch ctrl-ch})
         msgs (gen-msgs)]
-
+    (async/>!! ctrl-ch [::tailer/to-end!])
     (run! #(appender/write! *appender* %)
           msgs)
 
