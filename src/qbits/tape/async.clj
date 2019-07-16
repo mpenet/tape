@@ -8,9 +8,10 @@
 (defn tailer-chan
   ([queue]
    (tailer-chan queue nil))
-  ([queue {:keys [ch poll-interval]
+  ([queue {:keys [ch poll-interval meta?]
            :or {ch (async/chan)
-                poll-interval 50}
+                poll-interval 50
+                meta? true}
            :as opts}]
    (assert (satisfies? queue/IQueue queue))
    (async/thread
@@ -24,7 +25,11 @@
                              ;; on error just send ex to chan
                              e))]
              ;; enqueue and recur
-             (if (async/>!! ch x)
+             (if (async/>!! ch (cond-> x
+                                 meta?
+                                 (vary-meta assoc
+                                            :qbit.tape.tailer/index
+                                            (tailer/index tailer))))
                (recur)
                ;; move index back by one since we didn't consume that msg
                ;; and die
