@@ -48,10 +48,12 @@
   ([dir {:keys [roll-cycle autoclose-on-jvm-exit?
                 cycle-release-tasks
                 cycle-acquire-tasks
-                codec]
+                codec
+                block-size]
          :or {roll-cycle :small-daily
               autoclose-on-jvm-exit? true
-              codec fressian.codec/default}}]
+              codec fressian.codec/default
+              block-size 1e9}}]
    (let [^SingleChronicleQueue queue
          (cond-> (ChronicleQueue/singleBuilder ^String dir)
            roll-cycle
@@ -63,6 +65,9 @@
                                                     (->roll-cycle roll-cycle)
                                                     {:release-tasks cycle-release-tasks
                                                      :acquire-tasks cycle-acquire-tasks}))
+           (number? block-size)
+           (.blockSize (long block-size))
+
            :then (.build))
          q (reify
              IQueue
