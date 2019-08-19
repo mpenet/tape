@@ -52,8 +52,7 @@
                 block-size]
          :or {roll-cycle :small-daily
               autoclose-on-jvm-exit? true
-              codec fressian.codec/default
-              block-size 1e9}}]
+              codec fressian.codec/default}}]
    (let [^SingleChronicleQueue queue
          (cond-> (ChronicleQueue/singleBuilder ^String dir)
            roll-cycle
