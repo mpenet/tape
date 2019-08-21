@@ -52,6 +52,8 @@
        p/Datafiable
        (datafy [_]
          #::{:cycle (.cycle appender)
-             :last-index-appended (.lastIndexAppended appender)
+             :last-index-appended (try (.lastIndexAppended appender)
+                                       ;; nothing was appended yet
+                                       (catch java.lang.IllegalStateException e))
              :source-id (.sourceId appender)
              :queue queue})))))
