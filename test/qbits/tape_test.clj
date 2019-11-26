@@ -41,7 +41,7 @@
   (let [msgs (gen-msgs)]
     (doseq [m msgs]
       (appender/write! *appender* m))
-    (is (= msgs
+    (is (= (seq msgs)
            (repeatedly (count msgs)
                        #(tailer/read! *tailer*))))))
 
@@ -52,7 +52,7 @@
     (run! #(appender/write! *appender* %)
           msgs)
 
-    (is (= msgs
+    (is (= (seq msgs)
            (repeatedly (count msgs)
                        #(async/<!! tailer-ch))))))
 
@@ -63,7 +63,7 @@
     (run! #(async/>!! appender-ch %)
           msgs)
 
-    (is (= msgs
+    (is (= (seq msgs)
            (repeatedly (count msgs)
                        #(tailer/read! *tailer*))))))
 
@@ -71,7 +71,7 @@
   (let [msgs (gen-msgs)]
     (run! #(appender/write! *appender* %)
           msgs)
-    (let [fu (future (is (= msgs (into [] *tailer*))))]
+    (let [fu (future (is (= (vec msgs) (vec *tailer*))))]
       (Thread/sleep 100)
       (queue/close! *queue*)
       @fu)))
@@ -82,7 +82,7 @@
              (Thread/sleep 70)
              (appender/write! *appender* %))
           msgs)
-    (let [fu (future (is (= msgs (into [] *tailer*))))]
+    (let [fu (future (is (= (vec msgs) (vec *tailer*))))]
       (Thread/sleep 1000)
       (queue/close! *queue*)
       @fu)))
@@ -93,7 +93,7 @@
         idx (atom 0)]
     (run! #(appender/write! *appender* %)
           msgs)
-    (future (is (= (butlast msgs)
+    (future (is (= (vec (butlast msgs))
                    (into []
                          (keep #(if (> len (swap! idx inc))
                                   %
@@ -108,7 +108,7 @@
         idx (atom 0)]
     (run! #(appender/write! *appender* %)
           msgs)
-    (let [fu (future (is (= (butlast msgs)
+    (let [fu (future (is (= (vec (butlast msgs))
                             (reduce (fn [xs x]
                                       (if (> len (swap! idx inc))
                                         (conj xs x)
@@ -123,7 +123,7 @@
   (let [msgs (gen-msgs)]
     (run! #(appender/write! *appender* %)
           msgs)
-    (let [fu (future (is (= msgs (seq *tailer*))))]
+    (let [fu (future (is (= (seq msgs) (seq *tailer*))))]
       (Thread/sleep 100)
       (queue/close! *queue*)
       @fu)))
@@ -134,7 +134,7 @@
              (Thread/sleep 70)
              (appender/write! *appender* %))
           msgs)
-    (let [fu (future (is (= msgs (seq *tailer*))))]
+    (let [fu (future (is (= (seq msgs) (seq *tailer*))))]
       (Thread/sleep 1000)
       (queue/close! *queue*)
       @fu)))
