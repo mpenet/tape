@@ -54,7 +54,6 @@
                               java.nio.ByteBuffer/wrap
                               (codec/read codec)))
                        (catch Throwable t
-                         (.rollbackOnClose ctx)
                          t))]
              (when (instance? Throwable ret)
                (throw (ex-info "Tailer read failed"
