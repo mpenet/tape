@@ -5,7 +5,8 @@
             [clojure.core.protocols :as p])
   (:import (net.openhft.chronicle.queue ChronicleQueue
                                         ExcerptTailer
-                                        TailerDirection)))
+                                        TailerDirection)
+           (java.nio ByteBuffer)))
 
 (set! *warn-on-reflection* true)
 
@@ -47,21 +48,17 @@
        ITailer
        (read! [_]
          (with-open [ctx (.readingDocument tailer)]
-           (let [ret (try
-                       (when (.isPresent ctx)
-                         (->> ctx
-                              .wire .read .bytes
-                              java.nio.ByteBuffer/wrap
-                              (codec/read codec)))
-                       (catch Throwable t
-                         (.rollbackOnClose ctx)
-                         t))]
-             (when (instance? Throwable ret)
+           (try
+             (when (.isPresent ctx)
+               (->> ctx
+                    .wire .read .bytes
+                    (ByteBuffer/wrap)
+                    (codec/read codec)))
+             (catch Throwable t
                (throw (ex-info "Tailer read failed"
                                {:type ::read-failed
                                 :tailer tailer}
-                               ret)))
-             ret)))
+                               t))))))
 
        (set-direction! [_ direction]
          (.direction tailer (->tailer-direction direction)))
