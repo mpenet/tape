@@ -34,18 +34,16 @@
           ;; finally delete file we just compressed
           (io/delete-file file)))))
 
-(defn file-formatter
-  [fmt]
-  (DateTimeFormatter/ofPattern (format "%s'.cq4'")))
-
 (defn cycle-file?
-  [^RollCycle roll-cycle ^File file]
-  (try
-    (-> (format "%s'.cq4'" (.format roll-cycle))
-        DateTimeFormatter/ofPattern
-        (.parse (.getName file)))
-    (catch DateTimeParseException e
-      nil)))
+  [^DateTimeFormatter roll-cycle-dtf ^File file]
+  ; cycle files must ends with cq4, extract name
+  (when-let [fname (->> (.getName file)
+                        (re-find #"^(.*)\.cq4$")
+                        (second))]
+    (try
+      (.parse roll-cycle-dtf fname)
+      (catch DateTimeParseException e
+        nil))))
 
 (defn gzip-file?
   [^File file]
@@ -66,9 +64,11 @@
 
 (defn cycle-files
   "Returns seq of cycle files sorted by date"
-  [{:keys [dir roll-cycle]}]
-  (filter-files-by dir
-                   #(cycle-file? roll-cycle %)))
+  [{:keys [dir ^RollCycle roll-cycle]}]
+  (let [roll-cycle-dtf (-> (.format roll-cycle)
+                           (DateTimeFormatter/ofPattern))]
+    (filter-files-by dir
+                     #(cycle-file? roll-cycle-dtf %))))
 
 (defn gzip-files
   "Returns seq of gzip files sorted by date"
