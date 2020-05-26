@@ -5,4 +5,7 @@
   :dependencies ~(deps)
   :pedantic? :warn
   :source-paths ["src"]
+  :jvm-opts ["--illegal-access=permit"
+             "--add-exports"
+             "java.base/jdk.internal.ref=ALL-UNNAMED"]
   :global-vars {*warn-on-reflection* true})
