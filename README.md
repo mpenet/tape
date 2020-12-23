@@ -11,7 +11,7 @@ helpers for clojure.
 
 In short for when Kafka is too much and durable-queue not enough.
 
-Chronicle Queue is similar to a low latency broker less
+Chronicle Queue is similar to a low latency broker-less
 durable/persisted JVM topic. Tape focuses on embedded usage (we do not
 support topic distribution).  It's essentially a disk-backed queue,
 allowing for queues that can survive processes dying, and whose size
