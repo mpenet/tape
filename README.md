@@ -11,6 +11,17 @@ helpers for clojure.
 
 In short for when Kafka is too much and durable-queue not enough.
 
+Chronicle Queue is similar to a low latency broker less
+durable/persisted JVM topic. Tape focuses on embedded usage (we do not
+support topic distribution).  It's essentially a disk-backed queue,
+allowing for queues that can survive processes dying, and whose size
+is bounded by available disk rather than memory.
+
+Conceptually the api is somewhat similar to kafka, you can replay
+queues, set tailer's index etc... It stores everything on flat-files,
+you can control how rollup/purge of these happens via queue options.
+
+
 I'd encourage you read about [Chronicle
 Queue](https://github.com/OpenHFT/Chronicle-Queue) if you want to use
 this lib, Chronicle Queue comes with its set of tradeoffs you want to
