@@ -9,8 +9,9 @@
         org.clojure/test.check {:mvn/version "1.0.0"}}
 
  :aliases
- {:nrepl {:extra-deps {nrepl/nrepl {:mvn/version "1.3.1"}}
-          :main-opts ["-m" "nrepl.cmdline"]}
+ {:build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.5"}
+                 slipset/deps-deploy {:mvn/version "0.2.2"}}
+          :ns-default build}
   :test {:jvm-opts ["--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED"
                     "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED"
                     "--add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED"
