@@ -25,9 +25,6 @@ Queue](https://github.com/OpenHFT/Chronicle-Queue) if you want to use
 this lib, Chronicle Queue comes with its set of tradeoffs you want to
 know first.
 
-Started with a fork of https://github.com/malesch/croque and ended up
-rewriting/dropping most of it, hence the rename.
-
 ## Installation
 
 `tape` is [available on Clojars](https://clojars.org/cc.qbits/tape).
