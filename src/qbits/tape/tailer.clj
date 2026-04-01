@@ -28,6 +28,7 @@
   `poll-interval` will set the wait interval the tailer will apply
   when used in a reducible or seq context only when there are no new
   message ready to be consumed.
+  `tailer-id` can be passed for restartable tailers.
 
   clojure.datafy/datafy can be called on the tailer to get associated data
 
@@ -40,9 +41,13 @@
   https://github.com/OpenHFT/Chronicle-Queue#how-does-chronicle-queue-work"
   ([queue]
    (make queue nil))
-  ([queue {:keys [poll-interval]
+  ([queue {:keys [poll-interval
+                  tailer-id]
            :or {poll-interval 50}}]
-   (let [^ExcerptTailer tailer (.createTailer (q/underlying-queue queue))
+   (let [^ExcerptTailer tailer
+         (if tailer-id
+           (.createTailer (q/underlying-queue queue) tailer-id)
+           (.createTailer (q/underlying-queue queue)))
          codec (q/codec queue)]
      (reify
        ITailer
