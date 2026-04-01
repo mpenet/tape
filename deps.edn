@@ -1,26 +1,25 @@
 {:paths ["resources" "src"]
 
- :deps {org.clojure/clojure {:mvn/version "1.10.1"}
-        org.clojure/core.async {:mvn/version "1.3.610"}
-        org.clojure/tools.logging {:mvn/version "1.1.0"}
-        net.openhft/chronicle-queue {:mvn/version "5.21ea8"}
+ :deps {org.clojure/clojure {:mvn/version "1.12.2"}
+        org.clojure/core.async {:mvn/version "1.8.741"}
+        org.clojure/tools.logging {:mvn/version "1.3.0"}
+        net.openhft/chronicle-queue {:mvn/version "5.27ea5"}
         cc.qbits/commons {:mvn/version "1.0.0-alpha3"}
         org.clojure/data.fressian {:mvn/version "1.0.0"}
-        org.clojure/test.check {:mvn/version "1.0.0"}
-        net.openhft/chronicle-bytes {:mvn/version "2.21ea12"}}
+        org.clojure/test.check {:mvn/version "1.0.0"}}
 
  :aliases
- {:test {:extra-deps {lambdaisland/kaocha {:mvn/version "0.0-305"}
-                      org.slf4j/slf4j-log4j12 {:mvn/version "1.7.25"}}}
-
-  :cljfmt {:extra-deps {com.jameslaverack/cljfmt-runner {:git/url "https://github.com/JamesLaverack/cljfmt-runner"
-                                                         :sha "fc12c2724c44185cd1b221a79c8486c73846f14c"
-                                                         :exclusions [cljfmt]}
-                        cljfmt {:mvn/version "0.6.1"}}
-           :main-opts ["-m" "cljfmt-runner.check"]}
-
-  :cljfmt/fix {:main-opts ["-m" "cljfmt-runner.fix"]}
-
-  :eastwood
-  {:main-opts ["-m" "eastwood.lint" "{:source-paths,[\"src\"]}"]
-   :extra-deps {jonase/eastwood {:mvn/version "RELEASE"}}}}}
+ {:nrepl {:extra-deps {nrepl/nrepl {:mvn/version "1.3.1"}}
+          :main-opts ["-m" "nrepl.cmdline"]}
+  :test {:jvm-opts ["--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED"
+                    "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED"
+                    "--add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED"
+                    "--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED"
+                    "--add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED"
+                    "--add-opens=java.base/java.lang=ALL-UNNAMED"
+                    "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED"
+                    "--add-opens=java.base/java.io=ALL-UNNAMED"
+                    "--add-opens=java.base/java.util=ALL-UNNAMED"]
+         :extra-deps {lambdaisland/kaocha {:mvn/version "0.0-305"}
+                      org.clojure/test.check {:mvn/version "1.1.1"}
+                      org.slf4j/slf4j-log4j12 {:mvn/version "1.7.25"}}}}}

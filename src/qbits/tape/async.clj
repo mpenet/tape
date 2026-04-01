@@ -1,9 +1,9 @@
 (ns qbits.tape.async
   "Experimental core.async interface"
   (:require [clojure.core.async :as async]
-            [qbits.tape.tailer :as tailer]
+            [qbits.tape.appender :as appender]
             [qbits.tape.queue :as queue]
-            [qbits.tape.appender :as appender]))
+            [qbits.tape.tailer :as tailer]))
 
 (defn tailer-chan
   ([tailer]
@@ -45,7 +45,7 @@
        (when-let [x (async/<!! ch)]
          (try
            (appender/write! appender x)
-           (catch Throwable t
-             (async/>!! error-ch x)))
+           (catch Throwable e
+             (async/>!! error-ch e)))
          (recur))))
    ch))

@@ -1,15 +1,13 @@
 (ns qbits.tape.queue
-  (:require [qbits.commons.enum :as enum]
-            [qbits.commons.jvm :as jvm]
+  (:require [clojure.core.protocols :as p]
             [clojure.tools.logging :as log]
-            [clojure.core.protocols :as p]
-            [qbits.tape.cycle-listener :as cycle-listener]
-            [qbits.tape.codec.fressian :as fressian.codec])
+            [qbits.commons.enum :as enum]
+            [qbits.commons.jvm :as jvm]
+            [qbits.tape.codec.fressian :as fressian.codec]
+            [qbits.tape.cycle-listener :as cycle-listener])
   (:import (net.openhft.chronicle.queue ChronicleQueue
-                                        RollCycles
-                                        ExcerptTailer)
-           (net.openhft.chronicle.queue.impl.single SingleChronicleQueueBuilder
-                                                    SingleChronicleQueue)))
+                                        RollCycles)
+           (net.openhft.chronicle.queue.impl.single SingleChronicleQueue)))
 
 (set! *warn-on-reflection* true)
 
@@ -22,15 +20,12 @@
   (underlying-queue ^net.openhft.chronicle.queue.impl.single.SingleChronicleQueue [q]
     "Returns the underlying chronicle-queue instance"))
 
-(defn ^java.io.Closeable make
+(defn make
   "Return a queue instance that will create/bind to a directory
 
-  * `roll-cycle` roll-cycle determines how often you create a new
-  Chronicle Queue data file. Can be `:minutely`, `:daily`,
-  `:test4-daily`, `:test-hourly`, `:hourly`, `:test-secondly`,
-  `:huge-daily-xsparse`, `:test-daily`, `:large-hourly-xsparse`,
-  `:large-daily`, `:test2-daily`, `:xlarge-daily`, `:huge-daily`,
-  `:large-hourly`, `:small-daily`, `:large-hourly-sparse`
+  * `roll-cycle` roll-cycle determines how often you create a new Chronicle
+  Queue data file. Can
+  be :twenty-minutely, :six-hourly, :four-hourly, :fast-daily, :ten-minutely, :weekly, :five-minutely, :two-hourly, :half-hourly, :fast-hourly
 
   * `autoclose-on-jvm-exit?` wheter to cleanly close the queue on jvm
   exit (defaults to true)
@@ -43,16 +38,16 @@
 
   * `codec` qbits.tape.codec/ICodec instance that will be used to
   encode/decode messages. Default to qbits.tape.codec.fressian/default"
-  ([dir]
+  (^java.io.Closeable [dir]
    (make dir nil))
-  ([dir {:keys [roll-cycle autoclose-on-jvm-exit?
-                cycle-release-tasks
-                cycle-acquire-tasks
-                codec
-                block-size]
-         :or {roll-cycle :small-daily
-              autoclose-on-jvm-exit? true
-              codec fressian.codec/default}}]
+  (^java.io.Closeable [dir {:keys [roll-cycle autoclose-on-jvm-exit?
+                                   cycle-release-tasks
+                                   cycle-acquire-tasks
+                                   codec
+                                   block-size]
+                            :or {roll-cycle :fast-daily
+                                 autoclose-on-jvm-exit? true
+                                 codec fressian.codec/default}}]
    (let [^SingleChronicleQueue queue
          (cond-> (ChronicleQueue/singleBuilder ^String dir)
            roll-cycle
@@ -70,22 +65,22 @@
            :then (.build))
          q (reify
              IQueue
-             (closed? [this]
+             (closed? [_this]
                (.isClosed queue))
 
-             (close! [this]
+             (close! [_this]
                (.close queue))
 
-             (codec [this]
+             (codec [_this]
                codec)
 
-             (underlying-queue [this] queue)
+             (underlying-queue [_this] queue)
 
              java.io.Closeable
-             (close [this] (.close queue))
+             (close [_this] (.close queue))
 
              p/Datafiable
-             (datafy [this]
+             (datafy [_this]
                #::{:source-id (.sourceId queue)
                    :last-acknowledged-index-replicated (.lastAcknowledgedIndexReplicated queue)
                    :last-index-replicated (.lastIndexReplicated queue)

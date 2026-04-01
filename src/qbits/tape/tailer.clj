@@ -4,8 +4,7 @@
             [qbits.tape.codec :as codec]
             [qbits.tape.queue :as q])
   (:import (java.nio ByteBuffer)
-           (net.openhft.chronicle.queue ChronicleQueue
-                                        ExcerptTailer
+           (net.openhft.chronicle.queue ExcerptTailer
                                         TailerDirection)))
 
 (set! *warn-on-reflection* true)
@@ -88,7 +87,7 @@
             (when-not (q/closed? queue)
               (if-some [x (read! this)]
                 (cons x (lazy-seq (step)))
-                (do (Thread/sleep poll-interval)
+                (do (Thread/sleep (int poll-interval))
                     (recur)))))))
 
        clojure.lang.IReduceInit
@@ -102,7 +101,7 @@
                    @ret
                    (recur ret)))
                (do
-                 (Thread/sleep poll-interval)
+                 (Thread/sleep (int poll-interval))
                  (recur ret))))))
        clojure.lang.Sequential
 

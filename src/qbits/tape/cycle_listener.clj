@@ -1,13 +1,13 @@
 (ns qbits.tape.cycle-listener
   (:refer-clojure :exclude [cycle])
   (:require [clojure.java.io :as io]
-            [clojure.tools.logging :as log]
-            [clojure.string :as str])
-  (:import (net.openhft.chronicle.queue.impl StoreFileListener)
-           (net.openhft.chronicle.queue RollCycle RollCycles)
-           (java.io File FileOutputStream FileInputStream)
+            [clojure.string :as str]
+            [clojure.tools.logging :as log])
+  (:import (java.io File FileOutputStream FileInputStream)
+           (java.time.format DateTimeFormatter DateTimeParseException)
            (java.util.zip GZIPOutputStream)
-           (java.time.format DateTimeFormatter DateTimeParseException)))
+           (net.openhft.chronicle.queue RollCycle)
+           (net.openhft.chronicle.queue.impl StoreFileListener)))
 
 (set! *warn-on-reflection* true)
 
@@ -42,8 +42,7 @@
                         (second))]
     (try
       (.parse roll-cycle-dtf fname)
-      (catch DateTimeParseException e
-        nil))))
+      (catch DateTimeParseException _ nil))))
 
 (defn gzip-file?
   [^File file]
@@ -76,10 +75,10 @@
   (filter-files-by dir
                    gzip-file?))
 
-(defmulti action (fn [act ctx] (:type act)))
+(defmulti action (fn [act _ctx] (:type act)))
 
 (defmethod action :log
-  [opt ctx]
+  [_opt ctx]
   (run! #(log/info ::log (str %))
         (cycle-files ctx)))
 

@@ -1,10 +1,9 @@
 (ns qbits.tape.appender
   (:require [clojure.core.protocols :as p]
-            [qbits.tape.queue :as q]
-            [qbits.tape.codec :as codec])
-  (:import (net.openhft.chronicle.queue ChronicleQueue
-                                        ExcerptAppender)
-           (net.openhft.chronicle.bytes Bytes)))
+            [qbits.tape.codec :as codec]
+            [qbits.tape.queue :as q])
+  (:import (net.openhft.chronicle.bytes Bytes)
+           (net.openhft.chronicle.queue ExcerptAppender)))
 
 (set! *warn-on-reflection* true)
 
@@ -19,8 +18,8 @@
   You can also call datafy on the appender to get associated data."
   ([queue]
    (make queue nil))
-  ([queue opts]
-   (let [^ExcerptAppender appender (.acquireAppender (q/underlying-queue queue))
+  ([queue _opts]
+   (let [^ExcerptAppender appender (.createAppender (q/underlying-queue queue))
          codec (q/codec queue)]
      (reify
        IAppender
@@ -54,6 +53,6 @@
          #::{:cycle (.cycle appender)
              :last-index-appended (try (.lastIndexAppended appender)
                                        ;; nothing was appended yet
-                                       (catch java.lang.IllegalStateException e))
+                                       (catch java.lang.IllegalStateException _))
              :source-id (.sourceId appender)
              :queue queue})))))
