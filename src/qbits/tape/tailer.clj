@@ -1,12 +1,12 @@
 (ns qbits.tape.tailer
-  (:require [qbits.commons.enum :as enum]
+  (:require [clojure.core.protocols :as p]
+            [qbits.commons.enum :as enum]
             [qbits.tape.codec :as codec]
-            [qbits.tape.queue :as q]
-            [clojure.core.protocols :as p])
-  (:import (net.openhft.chronicle.queue ChronicleQueue
+            [qbits.tape.queue :as q])
+  (:import (java.nio ByteBuffer)
+           (net.openhft.chronicle.queue ChronicleQueue
                                         ExcerptTailer
-                                        TailerDirection)
-           (java.nio ByteBuffer)))
+                                        TailerDirection)))
 
 (set! *warn-on-reflection* true)
 
@@ -28,7 +28,7 @@
   `poll-interval` will set the wait interval the tailer will apply
   when used in a reducible or seq context only when there are no new
   message ready to be consumed.
-  `tailer-id` can be passed for restartable tailers.
+  `id` can be passed for restartable tailers.
 
   clojure.datafy/datafy can be called on the tailer to get associated data
 
@@ -42,11 +42,11 @@
   ([queue]
    (make queue nil))
   ([queue {:keys [poll-interval
-                  tailer-id]
+                  id]
            :or {poll-interval 50}}]
    (let [^ExcerptTailer tailer
-         (if tailer-id
-           (.createTailer (q/underlying-queue queue) tailer-id)
+         (if id
+           (.createTailer (q/underlying-queue queue) id)
            (.createTailer (q/underlying-queue queue)))
          codec (q/codec queue)]
      (reify
